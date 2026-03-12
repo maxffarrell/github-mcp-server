@@ -59,7 +59,12 @@ func createGitHubClients(cfg github.MCPServerConfig, apiHost utils.APIHostResolv
 	}
 
 	// Construct REST client
-	restClient := gogithub.NewClient(nil).WithAuthToken(cfg.Token)
+	restHTTPClient := &http.Client{
+		Transport: &transport.APIVersionTransport{
+			Transport: http.DefaultTransport,
+		},
+	}
+	restClient := gogithub.NewClient(restHTTPClient).WithAuthToken(cfg.Token)
 	restClient.UserAgent = fmt.Sprintf("github-mcp-server/%s", cfg.Version)
 	restClient.BaseURL = restURL
 	restClient.UploadURL = uploadURL
